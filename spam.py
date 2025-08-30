@@ -7,7 +7,7 @@ import re
 import time
 
 
-data = pd.read_csv("C:\\Users\\anubh\\Documents\\Spam Detection\\mail_dataSet.csv")
+data = pd.read_csv("C:/Users/anubh/Documents/Spam Detection/mail_dataSet.csv")
 data.drop_duplicates(inplace=True)
 data["Category"] = data["Category"].replace(["ham", "spam"],["Not Spam", "Spam"])
 
@@ -51,4 +51,5 @@ if st.button("Validate"):
             else:
               st.markdown("<h5 style='color: black;'>Message: Not Spam</h5>", unsafe_allow_html=True)
     else:
+
         st.warning("Please enter a message to validate.")

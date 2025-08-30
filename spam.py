@@ -38,7 +38,7 @@ def predict(message):
     result = model.predict(input_message)
     return result[0]
 
-st.header("Email Classifier")
+st.header("Spam Classifier")
 input_mess = st.text_input("Enter the Message")
 
 if st.button("Validate"):

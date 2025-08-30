@@ -1,13 +1,17 @@
-# 📧 Spam Detection
+# 📧 Spam Detection (Naive Bayes + Streamlit)
 
-A simple machine learning project to classify emails as **Spam** or **Not Spam** using a dataset of email messages.
+A machine learning project to classify emails as **Spam** or **Not Spam** using a **Naive Bayes classifier** and a **bag-of-words model**.  
+The project also includes a **Streamlit web app** for interactive spam classification.
 
 ---
 
 ## 🚀 Features
-- Preprocesses email text data
-- Trains a spam detection model
-- Classifies new messages as spam/ham
-- Uses a dataset of labeled emails (`mail_dataSet.csv`)
+- Preprocesses and cleans email text
+- Uses **CountVectorizer** for feature extraction
+- Trains a **Multinomial Naive Bayes** classifier
+- Provides accuracy on test data
+- Streamlit-based UI to classify custom messages
 
 ---
+
+## 📂 Project Structure

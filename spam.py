@@ -47,10 +47,11 @@ if st.button("Validate"):
             time.sleep(2)
             output = predict(input_mess)
             if output == "Spam":
-              st.markdown("<h5 style='color: black;'>Message: Spam</h5>", unsafe_allow_html=True)
+              st.markdown("<h5 style='color: green;'>Message: Spam</h5>", unsafe_allow_html=True)
             else:
-              st.markdown("<h5 style='color: black;'>Message: Not Spam</h5>", unsafe_allow_html=True)
+              st.markdown("<h5 style='color: green;'>Message: Not Spam</h5>", unsafe_allow_html=True)
     else:
 
         st.warning("Please enter a message to validate.")
+
 

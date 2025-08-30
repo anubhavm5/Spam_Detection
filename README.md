@@ -13,5 +13,3 @@ The project also includes a **Streamlit web app** for interactive spam classific
 - Streamlit-based UI to classify custom messages
 
 ---
-
-## 📂 Project Structure

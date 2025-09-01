@@ -58,18 +58,14 @@ st.markdown("""
             font-size: 18px;
             text-align: center;
         }
-        .result-box.spam {
-            background-color: #FADBD8;
-            color: #C0392B;
-        }
+
     </style>
 """, unsafe_allow_html=True)
 
-# ---------- Title ----------
-st.markdown("<div class='title'>📩 Message Classifier</div>", unsafe_allow_html=True)
+st.markdown("<div class='title'>📩 Spam Classifier</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Detect whether a message is <strong>Spam</strong> or <strong>Not Spam</strong></div>", unsafe_allow_html=True)
 
-# ---------- Load and Preprocess Data ----------
+
 data = pd.read_csv("mail_dataSet.csv")
 data.drop_duplicates(inplace=True)
 data["Category"] = data["Category"].replace(["ham", "spam"], ["Not Spam", "Spam"])
@@ -98,7 +94,6 @@ def predict(message):
     result = model.predict(input_message)
     return result[0]
 
-# ---------- UI Input ----------
 with st.container():
     input_mess = st.text_input("💬 Enter your message below:", key="input_text")
     
@@ -113,4 +108,5 @@ with st.container():
                     st.markdown(f"<div class='result-box'>✅ This message is <strong>NOT SPAM</strong></div>", unsafe_allow_html=True)
         else:
             st.warning("⚠️ Please enter a message to classify.")
+
 

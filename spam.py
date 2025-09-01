@@ -6,37 +6,73 @@ import streamlit as st
 import re
 import time
 
-# --- Custom CSS Styling ---
+# ---------- Custom CSS ----------
 st.markdown("""
     <style>
-        .main {
-            background-color: #f0f2f6;
+        body {
+            background-color: #f5f7fa;
         }
-        .stTextInput > div > div > input {
-            background-color: #fff5f5;
-            color: #333;
+        .main {
+            padding: 2rem;
+        }
+        .title {
+            font-size: 42px;
+            font-weight: 800;
+            color: #2E4053;
+            text-align: center;
+            margin-bottom: 0.5em;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: #566573;
+            text-align: center;
+            margin-bottom: 2em;
+        }
+        .input-box input {
+            background-color: #ffffff;
+            border: 2px solid #5DADE2;
+            border-radius: 10px;
+            padding: 0.75em;
             font-size: 16px;
-            border: 1px solid #ff4b4b;
+            color: #2c3e50;
         }
         .stButton > button {
-            background-color: #ff4b4b;
+            background-color: #5DADE2;
             color: white;
             font-weight: bold;
-            border-radius: 8px;
+            font-size: 16px;
+            padding: 0.6em 1.5em;
+            border-radius: 10px;
+            margin-top: 1em;
         }
         .stButton > button:hover {
-            background-color: #d43838;
+            background-color: #3498DB;
         }
-        h1, h2, h3, h4, h5 {
-            font-family: 'Segoe UI', sans-serif;
+        .result-box {
+            background-color: #D5F5E3;
+            color: #1D8348;
+            padding: 1em;
+            border-radius: 10px;
+            margin-top: 2em;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+        }
+        .result-box.spam {
+            background-color: #FADBD8;
+            color: #C0392B;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# --- Data Loading and Preprocessing ---
+# ---------- Title ----------
+st.markdown("<div class='title'>📩 Message Classifier</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Detect whether a message is <strong>Spam</strong> or <strong>Not Spam</strong></div>", unsafe_allow_html=True)
+
+# ---------- Load and Preprocess Data ----------
 data = pd.read_csv("mail_dataSet.csv")
 data.drop_duplicates(inplace=True)
-data["Category"] = data["Category"].replace(["ham", "spam"],["Not Spam", "Spam"])
+data["Category"] = data["Category"].replace(["ham", "spam"], ["Not Spam", "Spam"])
 
 def preprocess_text(text):
     text = text.lower()
@@ -56,25 +92,25 @@ features = cv.fit_transform(mess_train)
 model = MultinomialNB()
 model.fit(features, cat_train)
 
-# --- Prediction Function ---
 def predict(message):
     message = preprocess_text(message)
     input_message = cv.transform([message]).toarray()
     result = model.predict(input_message)
     return result[0]
 
-# --- Streamlit UI ---
-st.header("📩 Message Classifier")
-input_mess = st.text_input("Enter the Message")
+# ---------- UI Input ----------
+with st.container():
+    input_mess = st.text_input("💬 Enter your message below:", key="input_text")
+    
+    if st.button("🔍 Check Message"):
+        if input_mess.strip():
+            with st.spinner("Analyzing..."):
+                time.sleep(1.5)
+                output = predict(input_mess)
+                if output == "Spam":
+                    st.markdown(f"<div class='result-box spam'>🚫 This message is likely <strong>SPAM</strong></div>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"<div class='result-box'>✅ This message is <strong>NOT SPAM</strong></div>", unsafe_allow_html=True)
+        else:
+            st.warning("⚠️ Please enter a message to classify.")
 
-if st.button("Validate"):
-    if input_mess.strip():
-        with st.spinner("🔍 Checking Message Type..."):
-            time.sleep(2)
-            output = predict(input_mess)
-            if output == "Spam":
-                st.markdown("<h5 style='color: red;'>⚠️ Message: Spam</h5>", unsafe_allow_html=True)
-            else:
-                st.markdown("<h5 style='color: green;'>✅ Message: Not Spam</h5>", unsafe_allow_html=True)
-    else:
-        st.warning("⚠️ Please enter a message to validate.")

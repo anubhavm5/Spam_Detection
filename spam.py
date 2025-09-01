@@ -6,68 +6,87 @@ import streamlit as st
 import re
 import time
 
+# ------------------ Custom CSS for Beautiful UI ------------------
+st.set_page_config(page_title="Spam Detector", page_icon="📩", layout="centered")
+
 st.markdown("""
     <style>
+        /* General app background and font */
         body {
             background-color: #f5f7fa;
+            font-family: 'Segoe UI', sans-serif;
         }
-        .main {
-            padding: 2rem;
-        }
+
         .title {
-            font-size: 42px;
-            font-weight: 800;
-            color: #2E4053;
             text-align: center;
-            margin-bottom: 0.5em;
+            font-size: 48px;
+            font-weight: bold;
+            color: #2E86C1;
+            margin-bottom: 0.1em;
         }
+
         .subtitle {
-            font-size: 18px;
-            color: #566573;
             text-align: center;
+            font-size: 20px;
+            color: #566573;
             margin-bottom: 2em;
         }
-        .input-box input {
-            background-color: #ffffff;
-            border: 2px solid #5DADE2;
-            border-radius: 10px;
-            padding: 0.75em;
+
+        .input-area textarea {
+            border: 2px solid #3498DB !important;
+            border-radius: 10px !important;
+            padding: 10px;
             font-size: 16px;
-            color: #2c3e50;
         }
-        .stButton > button {
-            background-color: #5DADE2;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            padding: 0.6em 1.5em;
-            border-radius: 10px;
-            margin-top: 1em;
-        }
-        .stButton > button:hover {
+
+        .stButton>button {
             background-color: #3498DB;
-        }
-        .result-box {
-            background-color: #D5F5E3;
-            color: #1D8348;
-            padding: 1em;
+            color: white;
+            border: none;
             border-radius: 10px;
-            margin-top: 2em;
+            padding: 0.5em 2em;
+            font-size: 16px;
             font-weight: bold;
-            font-size: 18px;
-            text-align: center;
         }
-        .result-box.spam {
+
+        .stButton>button:hover {
+            background-color: #2E86C1;
+            color: white;
+        }
+
+        .result-box {
+            margin-top: 2em;
+            padding: 1.2em;
+            border-radius: 10px;
+            font-size: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .spam {
             background-color: #FADBD8;
             color: #C0392B;
+        }
+
+        .not-spam {
+            background-color: #D4EFDF;
+            color: #1E8449;
+        }
+
+        .footer {
+            margin-top: 4em;
+            font-size: 13px;
+            text-align: center;
+            color: #95A5A6;
         }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<div class='title'>📩 Message Classifier</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Detect whether a message is <strong>Spam</strong> or <strong>Not Spam</strong></div>", unsafe_allow_html=True)
+# ------------------ Title Section ------------------
+st.markdown("<div class='title'>📩 Spam Message Classifier</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Type or paste a message to check if it's <b>Spam</b> or <b>Not Spam</b>.</div>", unsafe_allow_html=True)
 
-# ---------- Load and Preprocess Data ----------
+# ------------------ Load and Train Model ------------------
 data = pd.read_csv("mail_dataSet.csv")
 data.drop_duplicates(inplace=True)
 data["Category"] = data["Category"].replace(["ham", "spam"], ["Not Spam", "Spam"])
@@ -79,11 +98,10 @@ def preprocess_text(text):
     return text
 
 data["Message"] = data["Message"].apply(preprocess_text)
-
 mess = data["Message"]
 cat = data["Category"]
-(mess_train, mess_test, cat_train, cat_test) = train_test_split(mess, cat, test_size=0.2)
 
+mess_train, mess_test, cat_train, cat_test = train_test_split(mess, cat, test_size=0.2)
 cv = CountVectorizer(stop_words="english")
 features = cv.fit_transform(mess_train)
 
@@ -92,23 +110,26 @@ model.fit(features, cat_train)
 
 def predict(message):
     message = preprocess_text(message)
-    input_message = cv.transform([message]).toarray()
-    result = model.predict(input_message)
-    return result[0]
+    input_features = cv.transform([message]).toarray()
+    return model.predict(input_features)[0]
 
-# ---------- UI Input ----------
-with st.container():
-    input_mess = st.text_input("💬 Enter your message below:", key="input_text")
-    
-    if st.button("🔍 Check Message"):
-        if input_mess.strip():
-            with st.spinner("Analyzing..."):
-                time.sleep(1.5)
-                output = predict(input_mess)
-                if output == "Spam":
-                    st.markdown(f"<div class='result-box spam'>🚫 This message is likely <strong>SPAM</strong></div>", unsafe_allow_html=True)
-                else:
-                    st.markdown(f"<div class='result-box'>✅ This message is <strong>NOT SPAM</strong></div>", unsafe_allow_html=True)
+# ------------------ UI Input ------------------
+with st.form("spam_form"):
+    input_message = st.text_area("✏️ Enter your message here", height=150, key="input", placeholder="e.g., You have won a $1000 Walmart gift card. Click here to claim now!")
+    submitted = st.form_submit_button("🔍 Check Message")
+
+    if submitted:
+        if input_message.strip() == "":
+            st.warning("⚠️ Please enter a message to check.")
         else:
-            st.warning("⚠️ Please enter a message to classify.")
+            with st.spinner("Analyzing your message..."):
+                time.sleep(1.5)
+                result = predict(input_message)
 
+            if result == "Spam":
+                st.markdown("<div class='result-box spam'>🚫 This message is likely <b>SPAM</b></div>", unsafe_allow_html=True)
+            else:
+                st.markdown("<div class='result-box not-spam'>✅ This message is <b>NOT SPAM</b></div>", unsafe_allow_html=True)
+
+# ------------------ Footer ------------------
+st.markdown("<div class='footer'>Built with ❤️ using Streamlit & Scikit-learn</div>", unsafe_allow_html=True)

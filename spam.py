@@ -62,7 +62,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<div class='title'>📩 Spam Classifier</div>", unsafe_allow_html=True)
+st.markdown("<div class='title'>📩 Spam Detection</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Detect whether a message is <strong>Spam</strong> or <strong>Not Spam</strong></div>", unsafe_allow_html=True)
 
 
